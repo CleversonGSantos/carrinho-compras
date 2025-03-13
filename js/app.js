@@ -83,3 +83,6 @@ function limpar() {
 
 // Executa a função limpar quando a página é carregada pela primeira vez
 document.addEventListener('DOMContentLoaded', limpar);
+
+// Exporta as funções para uso em testes
+export { validarQuantidade, extrairValorProduto, criarElementoProduto };

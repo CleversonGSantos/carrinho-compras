@@ -4,7 +4,7 @@
  * @returns {boolean} - Retorna true se a quantidade for válida, caso contrário, false.
  */
 function validarQuantidade(quantidade) {
-    if (isNaN(quantidade)) {
+    if (isNaN(quantidade) || quantidade <= 0) {
         alert("Por favor, insira uma quantidade válida.");
         return false;
     }
@@ -18,8 +18,9 @@ function validarQuantidade(quantidade) {
  */
 function extrairValorProduto(produto) {
     let valor = parseInt(produto.split('-').pop().trim().replace('R$', ''));
-    if (isNaN(valor)) {
+    if (isNaN(valor) || valor <= 0) {
         alert("Por favor, insira um valor válido para o produto: " + produto);
+        return NaN;
     }
     return valor;
 }
@@ -37,7 +38,7 @@ function criarElementoProduto(produtoInfo) {
 }
 
 /**
- * Adiciona produtos ao carrinho de compras.
+ * Adiciona um produto ao carrinho de compras.
  * Obtém os valores dos campos de entrada, valida-os e atualiza a lista de produtos e o valor total no carrinho.
  */
 function adicionar() {
@@ -45,38 +46,40 @@ function adicionar() {
     let quantidade = parseInt(document.getElementById('quantidade').value.trim());
     let valorTotal = parseInt(document.getElementById('valor-total').textContent.trim().replace('R$', '')) || 0;
     let listaCarrinho = document.getElementById('lista-produtos');
-    let produtos = produtoSelecionado.split(',');
 
     if (!validarQuantidade(quantidade)) {
         return;
     }
 
-    for (let i = 0; i < produtos.length; i++) {
-        let produtoAtual = produtos[i].trim();
-        let valor = extrairValorProduto(produtoAtual);
-        
-        if (isNaN(valor)) {
-            return;
-        }
-        
-        let produtoInfo = {
-            nome: produtoAtual.split('-')[0].trim(),
-            quantidade: quantidade,
-            valor: valor,
-            valorTotal: quantidade * valor
-        };
-        
-        let item = criarElementoProduto(produtoInfo);
-        listaCarrinho.appendChild(item);
-
-        valorTotal += produtoInfo.valorTotal;
+    let valor = extrairValorProduto(produtoSelecionado);
+    if (isNaN(valor)) {
+        return;
     }
 
+    let produtoInfo = {
+        nome: produtoSelecionado.split('-')[0].trim(),
+        quantidade: quantidade,
+        valor: valor,
+        valorTotal: quantidade * valor
+    };
+
+    let item = criarElementoProduto(produtoInfo);
+    listaCarrinho.appendChild(item);
+
+    valorTotal += produtoInfo.valorTotal;
     document.getElementById('valor-total').textContent = `R$${valorTotal}`;
+    document.getElementById('quantidade').value = '';
 }
 
+/**
+ * Limpa o carrinho de compras.
+ * Remove todos os produtos do carrinho e redefine o valor total.
+ */
 function limpar() { 
     document.getElementById('lista-produtos').innerHTML = '';
     document.getElementById('valor-total').textContent = 'R$0';
     document.getElementById('quantidade').value = '';
 }
+
+// Executa a função limpar quando a página é carregada pela primeira vez
+document.addEventListener('DOMContentLoaded', limpar);
